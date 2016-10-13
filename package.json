@@ -1,0 +1,30 @@
+{
+  "name": "server-factory",
+  "version": "0.0.1",
+  "description": "Create multiple servers based on protocols",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard | snazzy && tap test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcollina/server-factory.git"
+  },
+  "keywords": [
+    "server",
+    "tcp",
+    "tls",
+    "http",
+    "https",
+    "websocket",
+    "ws",
+    "wss",
+    "factory"
+  ],
+  "author": "Matteo Collina <hello@matteocollina.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mcollina/server-factory/issues"
+  },
+  "homepage": "https://github.com/mcollina/server-factory#readme"
+}
