@@ -4,6 +4,7 @@ const websocket = require('websocket-stream')
 const http = require('http')
 const EE = require('events')
 const net = require('net')
+const tls = require('tls')
 const steed = require('steed')
 
 function factory (list) {
@@ -36,6 +37,9 @@ function factory (list) {
       case 'tcp':
         createNet(opts, cb)
         break
+      case 'tls':
+        createTls(opts, cb)
+        break
       case 'ws':
         createWebsocket(opts, cb)
         break
@@ -49,6 +53,21 @@ function factory (list) {
     const port = opts.port || 0
 
     const server = net.createServer(onStream)
+
+    server.listen(port, host, function () {
+      server.removeListener('error', cb)
+      cb(null, server)
+    })
+
+    server.on('error', cb)
+  }
+
+  function createTls (opts, cb) {
+    const host = opts.hostname || opts.host
+    const port = opts.port || 0
+
+    const server = tls.createServer(opts)
+    server.on('secureConnection', onStream)
 
     server.listen(port, host, function () {
       server.removeListener('error', cb)
