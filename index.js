@@ -56,6 +56,7 @@ function factory (list) {
     }
     instances = i
     addresses = i.map((s) => s.address())
+    servers.emit('listening')
   })
 
   return servers
