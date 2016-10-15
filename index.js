@@ -7,6 +7,7 @@ const net = require('net')
 const tls = require('tls')
 const steed = require('steed')
 const https = require('https')
+const clone = require('clone')
 
 function factory (list) {
   const servers = new EE()
@@ -18,6 +19,7 @@ function factory (list) {
   }
 
   var instances = null
+  var addresses = []
 
   servers.close = function (cb) {
     if (instances) {
@@ -28,11 +30,7 @@ function factory (list) {
   }
 
   servers.addresses = function () {
-    if (!instances) {
-      return null
-    }
-
-    return instances.map((i) => i.address())
+    return clone(addresses)
   }
 
   const errored = !list.reduce(function (acc, opt) {
@@ -57,6 +55,7 @@ function factory (list) {
       return servers.emit('error', err)
     }
     instances = i
+    addresses = i.map((s) => s.address())
   })
 
   return servers
