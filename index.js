@@ -6,6 +6,7 @@ const EE = require('events')
 const net = require('net')
 const tls = require('tls')
 const steed = require('steed')
+const https = require('https')
 
 function factory (list) {
   const servers = new EE()
@@ -42,6 +43,9 @@ function factory (list) {
         break
       case 'ws':
         createWebsocket(opts, cb)
+        break
+      case 'wss':
+        createSecureWebsocket(opts, cb)
         break
       default:
         cb(new Error('unknown protocol: ' + opts.protocol))
@@ -82,6 +86,24 @@ function factory (list) {
     const port = opts.port || 0
 
     const server = http.createServer()
+
+    websocket.createServer({
+      server
+    }, onStream)
+
+    server.listen(port, host, function () {
+      server.removeListener('error', cb)
+      cb(null, server)
+    })
+
+    server.on('error', cb)
+  }
+
+  function createSecureWebsocket (opts, cb) {
+    const host = opts.hostname || opts.host
+    const port = opts.port || 0
+
+    const server = https.createServer(opts)
 
     websocket.createServer({
       server
