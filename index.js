@@ -10,17 +10,21 @@ const https = require('https')
 
 function factory (list) {
   const servers = new EE()
+  const protocols = {
+    tcp: createNet,
+    tls: createTls,
+    ws: createWebsocket,
+    wss: createSecureWebsocket
+  }
+
   var instances = null
 
-  steed.map(list, create, function (err, i) {
-    if (err) {
-      return servers.emit('error', err)
-    }
-    instances = i
-  })
-
   servers.close = function (cb) {
-    steed.map(instances, close, cb)
+    if (instances) {
+      steed.map(instances, close, cb)
+    } else if (cb) {
+      cb(new Error('not started yet'))
+    }
   }
 
   servers.addresses = function () {
@@ -31,25 +35,34 @@ function factory (list) {
     return instances.map((i) => i.address())
   }
 
+  const errored = !list.reduce(function (acc, opt) {
+    if (!acc) {
+      return false
+    }
+
+    const protocol = opt.protocol
+    if (!protocols[protocol]) {
+      process.nextTick(servers.emit.bind(servers, 'error'), new Error('Unknown protocol: ' + protocol))
+      return false
+    }
+    return true
+  }, true)
+
+  if (errored) {
+    return servers
+  }
+
+  steed.map(list, create, function (err, i) {
+    if (err) {
+      return servers.emit('error', err)
+    }
+    instances = i
+  })
+
   return servers
 
   function create (opts, cb) {
-    switch (opts.protocol) {
-      case 'tcp':
-        createNet(opts, cb)
-        break
-      case 'tls':
-        createTls(opts, cb)
-        break
-      case 'ws':
-        createWebsocket(opts, cb)
-        break
-      case 'wss':
-        createSecureWebsocket(opts, cb)
-        break
-      default:
-        cb(new Error('unknown protocol: ' + opts.protocol))
-    }
+    protocols[opts.protocol](opts, cb)
   }
 
   function createNet (opts, cb) {
