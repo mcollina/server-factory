@@ -55,7 +55,11 @@ function factory (list) {
       return servers.emit('error', err)
     }
     instances = i
-    addresses = i.map((s) => s.address())
+    addresses = i.map((s, index) => {
+      const address = s.address()
+      address.protocol = list[index].protocol
+      return address
+    })
     servers.emit('listening')
   })
 

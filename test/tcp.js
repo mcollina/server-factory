@@ -42,3 +42,8 @@ test('connect with data from server', (t) => {
 
   stream.write('hello')
 })
+
+test('set the protocol on addresses', (t) => {
+  t.equal(servers.addresses()[0].protocol, 'tcp')
+  t.end()
+})

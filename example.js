@@ -1,17 +1,3 @@
-# server-factory
-
-Create multiple servers on different protocols: tcp, tls, ws, wss.
-Emit `'stream'` when there is a new connection.
-
-## Install
-
-```
-npm i server-factory --save
-```
-
-## Example
-
-```js
 'use strict'
 
 const path = require('path')
@@ -43,8 +29,3 @@ servers.on('listening', function () {
 servers.on('stream', function (stream) {
   stream.pipe(stream)
 })
-```
-
-## License
-
-MIT
